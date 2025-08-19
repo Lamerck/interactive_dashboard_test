@@ -16,7 +16,7 @@ This project analyzes sentiment patterns in Ugandan YouTube comments using the *
 - ✅ ROI and engagement analysis
 
 ## Live Dashboard
-Visit the interactive dashboard: [**Live Demo**](your-github-pages-url)
+Visit the interactive dashboard: [**Live Demo**](https://lamerck.github.io/interactive_dashboard_test/)
 
 ## Key Findings
 - **79.1% Positive** sentiment overall
