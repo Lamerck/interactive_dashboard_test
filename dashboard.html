@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uganda Content Analysis Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .chart-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+            text-align: center;
+        }
+        
+        .chart-subtitle {
+            font-size: 0.9rem;
+            color: #666;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .chart-wrapper {
+            position: relative;
+            height: 400px;
+            margin-bottom: 20px;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .metric-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .metric-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .insights-box {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .insights-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .insight-item {
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: #555;
+        }
+        
+        .flag-emoji {
+            font-size: 1.5rem;
+            margin-right: 10px;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        .nav-btn.active {
+            background: white;
+            color: #667eea;
+            border-color: white;
+        }
+        
+        .chart-section {
+            display: none;
+        }
+        
+        .chart-section.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="header">
+            <h1>UGANDA YOUTUBE CONTENT SENTIMENT ANALYSIS</h1>
+            <h2 style="margin: 10px 0; font-size: 1.3rem; color: #FFD700; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">POWERED BY GANDA GEMMA</h2>
+            <p style="font-size: 1.0rem; color: #E6E6FA; margin: 5px 0;">By Crane AI Labs</p>
+            <p style="font-size: 1.1rem; line-height: 1.4; margin-top: 15px;">Comprehensive Analysis of 536 Sampled YouTube Comments</p>
+            <div style="background: rgba(255, 255, 255, 0.15); padding: 12px; border-radius: 8px; margin-top: 15px; font-size: 0.9rem;">
+                <strong>Model Performance:</strong> 79.1% Positive Sentiment Detection | Kirungi:Kibi Ratio 3.79:1
+            </div>
+        </div>
+        
+        <div class="nav-buttons">
+            <button class="nav-btn active" onclick="showChart('performance-matrix')">Performance Matrix</button>
+            <button class="nav-btn" onclick="showChart('channel-dashboard')">Channel Performance</button>
+            <button class="nav-btn" onclick="showChart('sentiment-flow')">Sentiment Flow</button>
+            <button class="nav-btn" onclick="showChart('language-mixing')">Language Analysis</button>
+            <button class="nav-btn" onclick="showChart('theme-radar')">Content Themes</button>
+            <button class="nav-btn" onclick="showChart('roi-matrix')">ROI Analysis</button>
+        </div>
+
+        <!-- Chart 1: Category Performance Matrix -->
+        <div id="performance-matrix" class="chart-section active">
+            <div class="chart-container">
+                <div class="chart-title">Category Performance Matrix</div>
+                <div class="chart-subtitle">Bubble size = Total Engagement | X-axis = Positivity Rate | Y-axis = Volume</div>
+                <div class="chart-wrapper">
+                    <canvas id="performanceMatrix"></canvas>
+                </div>
+                <div class="insights-box">
+                    <div class="insights-title">📊 Key Insights</div>
+                    <div class="insight-item">🎭 <strong>Comedy & Lifestyle:</strong> Highest positivity (94.3%) but moderate volume</div>
+                    <div class="insight-item">🏆 <strong>Sports & Events:</strong> Best balance of volume (154 comments) and positivity (81.2%)</div>
+                    <div class="insight-item">🎵 <strong>Music & Entertainment:</strong> Strong performance across all metrics</div>
+                    <div class="insight-item">⚠️ <strong>Politics:</strong> Critical situation - 74.1% negative sentiment</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart 2: Channel Performance Dashboard -->
+        <div id="channel-dashboard" class="chart-section">
+            <div class="chart-container">
+                <div class="chart-title">Channel Performance Dashboard</div>
+                <div class="chart-subtitle">Multi-metric performance analysis by channel</div>
+                <div class="chart-wrapper">
+                    <canvas id="channelDashboard"></canvas>
+                </div>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">96.2</div>
+                        <div class="metric-label">Top Score (KWEZI)</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">21.3%</div>
+                        <div class="metric-label">Crisis Channel (Ug Wolokoso)</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">3</div>
+                        <div class="metric-label">Excellent Performers</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">2</div>
+                        <div class="metric-label">Need Immediate Help</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart 3: Sentiment vs Engagement Flow -->
+        <div id="sentiment-flow" class="chart-section">
+            <div class="chart-container">
+                <div class="chart-title">Sentiment vs Engagement Flow</div>
+                <div class="chart-subtitle">How sentiment translates to engagement levels</div>
+                <div class="chart-wrapper">
+                    <canvas id="sentimentFlow"></canvas>
+                </div>
+                <div class="insights-box">
+                    <div class="insights-title">🌊 Flow Analysis</div>
+                    <div class="insight-item">📈 Positive comments get 1.64x more engagement than negative</div>
+                    <div class="insight-item">📊 No strong statistical correlation (r=0.060, p=0.165)</div>
+                    <div class="insight-item">💡 Content quality matters more than just sentiment</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart 4: Language Mixing Impact -->
+        <div id="language-mixing" class="chart-section">
+            <div class="chart-container">
+                <div class="chart-title">Language Mixing Impact on Sentiment</div>
+                <div class="chart-subtitle">English vs Luganda usage patterns and audience reception</div>
+                <div class="chart-wrapper">
+                    <canvas id="languageMixing"></canvas>
+                </div>
+                <div class="insights-box">
+                    <div class="insights-title">🗣️ Language Insights</div>
+                    <div class="insight-item">🇬🇧 Pure English dominates (53.7%) with high positivity (84.7%)</div>
+                    <div class="insight-item">🇺🇬 Pure Luganda shows mixed reception (53.6% positive)</div>
+                    <div class="insight-item">🔄 Balanced mixing performs well (80% positive)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart 5: Content Theme Radar -->
+        <div id="theme-radar" class="chart-section">
+            <div class="chart-container">
+                <div class="chart-title">Content Theme Performance Radar</div>
+                <div class="chart-subtitle">Volume vs Positivity across key themes</div>
+                <div class="chart-wrapper">
+                    <canvas id="themeRadar"></canvas>
+                </div>
+                <div class="insights-box">
+                    <div class="insights-title">🎯 Theme Strategy</div>
+                    <div class="insight-item">🙏 Religion leads in both volume (15.1%) and positivity (87.7%)</div>
+                    <div class="insight-item">🎵 Entertainment shows strong balance (12.5% volume, 94% positive)</div>
+                    <div class="insight-item">🏛️ Politics is high-risk (2.8% volume, 53.3% positive)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart 6: ROI Priority Matrix -->
+        <div id="roi-matrix" class="chart-section">
+            <div class="chart-container">
+                <div class="chart-title">ROI Priority Matrix</div>
+                <div class="chart-subtitle">Investment decisions based on ROI and growth potential</div>
+                <div class="chart-wrapper">
+                    <canvas id="roiMatrix"></canvas>
+                </div>
+                <div class="insights-box">
+                    <div class="insights-title">💰 Investment Strategy</div>
+                    <div class="insight-item">🏆 Sports & Events: Best ROI ($0.55/piece) with high volume</div>
+                    <div class="insight-item">🎵 Music: Strong ROI ($0.54/piece) - scale opportunity</div>
+                    <div class="insight-item">⚠️ Politics: Low ROI ($0.20/piece) - optimize or divest</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data from the analysis results
+        const categoryData = {
+            'Comedy & Lifestyle': { positivity: 94.3, volume: 106, engagement: 199 },
+            'Music & Entertainment': { positivity: 93.0, volume: 143, engagement: 700 },
+            'News & Current Affairs': { positivity: 86.5, volume: 52, engagement: 176 },
+            'Sports & Events': { positivity: 81.2, volume: 154, engagement: 765 },
+            'Politics & Social Issues': { positivity: 25.9, volume: 81, engagement: 120 }
+        };
+
+        const channelData = {
+            'KWEZI MEDIA GROUP': { score: 96.2, comments: 120, avgLikes: 6.3, positive: 85.0 },
+            'Elijah Kitaka': { score: 92.1, comments: 108, avgLikes: 6.3, positive: 93.5 },
+            'Comedy Store': { score: 62.4, comments: 106, avgLikes: 1.9, positive: 94.3 },
+            'Kasuku Live': { score: 49.8, comments: 46, avgLikes: 3.8, positive: 89.1 },
+            'UGXTRA Music': { score: 34.0, comments: 35, avgLikes: 0.6, positive: 91.4 },
+            'Ug Wolokoso Extra': { score: 29.2, comments: 61, avgLikes: 1.8, positive: 21.3 },
+            'Uganda Fan TV': { score: 26.1, comments: 34, avgLikes: 0.2, positive: 67.7 },
+            'NTV Akawungeezi': { score: 18.2, comments: 6, avgLikes: 0.0, positive: 66.7 },
+            'BBS Terefayina': { score: 16.6, comments: 20, avgLikes: 0.5, positive: 40.0 }
+        };
+
+        // Chart 1: Performance Matrix (Bubble Chart)
+        function createPerformanceMatrix() {
+            const ctx = document.getElementById('performanceMatrix').getContext('2d');
+            
+            const bubbleData = Object.entries(categoryData).map(([category, data]) => ({
+                x: data.positivity,
+                y: data.volume,
+                r: Math.sqrt(data.engagement) / 3, // Scale bubble size
+                category: category
+            }));
+
+            new Chart(ctx, {
+                type: 'bubble',
+                data: {
+                    datasets: [{
+                        label: 'Content Categories',
+                        data: bubbleData,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.7)',   // Comedy
+                            'rgba(54, 162, 235, 0.7)',   // Music
+                            'rgba(255, 205, 86, 0.7)',   // News
+                            'rgba(75, 192, 192, 0.7)',   // Sports
+                            'rgba(153, 102, 255, 0.7)'   // Politics
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 205, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const point = context.raw;
+                                    const category = bubbleData[context.dataIndex].category;
+                                    return [
+                                        category,
+                                        `Positivity: ${point.x}%`,
+                                        `Volume: ${point.y} comments`,
+                                        `Engagement: ${categoryData[category].engagement} likes`
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Positivity Rate (%)',
+                                font: { size: 14, weight: 'bold' }
+                            },
+                            min: 0,
+                            max: 100
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Comment Volume',
+                                font: { size: 14, weight: 'bold' }
+                            },
+                            min: 0
+                        }
+                    }
+                }
+            });
+        }
+
+        // Chart 2: Channel Dashboard (Horizontal Bar)
+        function createChannelDashboard() {
+            const ctx = document.getElementById('channelDashboard').getContext('2d');
+            
+            const channels = Object.keys(channelData);
+            const scores = channels.map(ch => channelData[ch].score);
+            const colors = scores.map(score => {
+                if (score >= 80) return 'rgba(75, 192, 192, 0.8)';      // Excellent - Teal
+                if (score >= 60) return 'rgba(54, 162, 235, 0.8)';      // Good - Blue
+                if (score >= 40) return 'rgba(255, 205, 86, 0.8)';      // Average - Yellow
+                return 'rgba(255, 99, 132, 0.8)';                       // Poor - Red
+            });
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: channels,
+                    datasets: [{
+                        label: 'Performance Score',
+                        data: scores,
+                        backgroundColor: colors,
+                        borderColor: colors.map(color => color.replace('0.8', '1')),
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const channel = context.label;
+                                    const data = channelData[channel];
+                                    return [
+                                        `Score: ${data.score}`,
+                                        `Comments: ${data.comments}`,
+                                        `Avg Likes: ${data.avgLikes}`,
+                                        `Positive: ${data.positive}%`
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Performance Score',
+                                font: { size: 14, weight: 'bold' }
+                            },
+                            min: 0,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        // Chart 3: Sentiment Flow (Stacked Bar)
+        function createSentimentFlow() {
+            const ctx = document.getElementById('sentimentFlow').getContext('2d');
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Positive Comments (424)', 'Negative Comments (112)'],
+                    datasets: [
+                        {
+                            label: 'High Engagement (10+ likes)',
+                            data: [47, 4], // Based on viral analysis
+                            backgroundColor: 'rgba(75, 192, 192, 0.8)'
+                        },
+                        {
+                            label: 'Medium Engagement (1-9 likes)',
+                            data: [200, 50],
+                            backgroundColor: 'rgba(54, 162, 235, 0.8)'
+                        },
+                        {
+                            label: 'Low Engagement (0 likes)',
+                            data: [177, 58],
+                            backgroundColor: 'rgba(201, 203, 207, 0.8)'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: true,
+                            title: {
+                                display: true,
+                                text: 'Sentiment Type',
+                                font: { size: 14, weight: 'bold' }
+                            }
+                        },
+                        y: {
+                            stacked: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Comments',
+                                font: { size: 14, weight: 'bold' }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Chart 4: Language Mixing (Doughnut)
+        function createLanguageMixing() {
+            const ctx = document.getElementById('languageMixing').getContext('2d');
+            
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: [
+                        'Pure English (53.7%)',
+                        'Unknown (36.0%)',
+                        'Pure Luganda (5.2%)',
+                        'English-Heavy Mix (3.7%)',
+                        'Balanced Mix (0.9%)',
+                        'Luganda-Heavy Mix (0.4%)'
+                    ],
+                    datasets: [{
+                        data: [288, 193, 28, 20, 5, 2],
+                        backgroundColor: [
+                            'rgba(54, 162, 235, 0.8)',   // Blue for English
+                            'rgba(201, 203, 207, 0.8)',  // Gray for Unknown
+                            'rgba(255, 205, 86, 0.8)',   // Yellow for Luganda
+                            'rgba(75, 192, 192, 0.8)',   // Teal for English-Heavy
+                            'rgba(153, 102, 255, 0.8)',  // Purple for Balanced
+                            'rgba(255, 159, 64, 0.8)'    // Orange for Luganda-Heavy
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Chart 5: Theme Radar
+        function createThemeRadar() {
+            const ctx = document.getElementById('themeRadar').getContext('2d');
+            
+            new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: [
+                        'Praise & Appreciation',
+                        'Religion & Spirituality',
+                        'Entertainment & Music',
+                        'Politics & Government',
+                        'Personal Emotions',
+                        'Criticism & Complaints'
+                    ],
+                    datasets: [
+                        {
+                            label: 'Volume (%)',
+                            data: [16.6, 15.1, 12.5, 2.8, 1.9, 0.9],
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 2,
+                            pointBackgroundColor: 'rgba(54, 162, 235, 1)'
+                        },
+                        {
+                            label: 'Positivity (%)',
+                            data: [97.8, 87.7, 94.0, 53.3, 100.0, 20.0],
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 2,
+                            pointBackgroundColor: 'rgba(255, 99, 132, 1)'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                stepSize: 20
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Chart 6: ROI Matrix (Scatter)
+        function createROIMatrix() {
+            const ctx = document.getElementById('roiMatrix').getContext('2d');
+            
+            const roiData = [
+                { x: 0.55, y: 154, label: 'Sports & Events' },
+                { x: 0.54, y: 143, label: 'Music & Entertainment' },
+                { x: 0.39, y: 52, label: 'News & Current Affairs' },
+                { x: 0.24, y: 106, label: 'Comedy & Lifestyle' },
+                { x: 0.20, y: 81, label: 'Politics & Social Issues' }
+            ];
+
+            new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Categories',
+                        data: roiData,
+                        backgroundColor: [
+                            'rgba(75, 192, 192, 0.8)',   // Sports
+                            'rgba(54, 162, 235, 0.8)',   // Music
+                            'rgba(255, 205, 86, 0.8)',   // News
+                            'rgba(255, 99, 132, 0.8)',   // Comedy
+                            'rgba(153, 102, 255, 0.8)'   // Politics
+                        ],
+                        borderColor: [
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 205, 86, 1)',
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(153, 102, 255, 1)'
+                        ],
+                        borderWidth: 2,
+                        pointRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const point = roiData[context.dataIndex];
+                                    return [
+                                        point.label,
+                                        `ROI: $${point.x}/piece`,
+                                        `Volume: ${point.y} comments`
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'ROI ($ per piece)',
+                                font: { size: 14, weight: 'bold' }
+                            },
+                            min: 0,
+                            max: 0.6
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Volume (comments)',
+                                font: { size: 14, weight: 'bold' }
+                            },
+                            min: 0
+                        }
+                    }
+                }
+            });
+        }
+
+        // Navigation function
+        function showChart(chartId) {
+            // Hide all sections
+            document.querySelectorAll('.chart-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(chartId).classList.add('active');
+            
+            // Update navigation buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        // Initialize all charts when page loads
+        window.onload = function() {
+            createPerformanceMatrix();
+            createChannelDashboard();
+            createSentimentFlow();
+            createLanguageMixing();
+            createThemeRadar();
+            createROIMatrix();
+        };
+    </script>
+</body>
+</html>
