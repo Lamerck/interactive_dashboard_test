@@ -2,7 +2,7 @@
 
 **AI-Powered Sentiment Analysis of Ugandan YouTube Comments using Ganda Gemma**
 
-[**Live Dashboard**](https://yourusername.github.io/repo-name/) | [ **View Analysis**](link-to-results)
+[**Live Dashboard**](https://lamerck.github.io/interactive_dashboard_test/) | [ **View Analysis**](link-to-results)
 
 ## Project Overview
 
